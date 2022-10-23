@@ -1,5 +1,6 @@
 package com.study.restapi.events;
 
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,9 +11,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
+@Entity
 public class Event {
 
+    @Id @GeneratedValue
     private Integer id;
+
     private String name;
     private String description;
     private LocalDateTime beginEnrollmentDateTime;
@@ -25,6 +29,8 @@ public class Event {
     private int limitOfEnrollment;
     private boolean offline;
     private boolean free;
+
+    @Enumerated(EnumType.STRING)
     private EventStatus eventStatus;
 
 }
