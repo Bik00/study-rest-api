@@ -1,5 +1,6 @@
 package com.study.restapi.events;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -7,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class EventTest {
 
     @Test
+    @DisplayName("Lombok 테스트 1 : 빌더 객체 테스트")
     public void builder() {
         Event event = Event.builder()
                 .name("Sprint Rest API")
@@ -16,6 +18,7 @@ class EventTest {
     }
 
     @Test
+    @DisplayName("Lombok 테스트 2 : 생성자 생성 테스트")
     public void javaBean() {
 
         // Given
