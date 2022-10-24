@@ -1,21 +1,15 @@
-package com.study.restapi.events;
+package com.study.restapi.events.Dto;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode(of = "id")
-@Entity
-public class Event {
-
-    @Id @GeneratedValue
-    private Integer id;
+@AllArgsConstructor
+public class EventDto {
 
     private String name;
     private String description;
@@ -23,14 +17,9 @@ public class Event {
     private LocalDateTime closeEnrollmentDateTime;
     private LocalDateTime beginEventDateTime;
     private LocalDateTime endEventDateTime;
-    private String location;            // 이게 없으면 온라인 모임
+    private String location;
     private int basePrice;              // (optional)
     private int maxPrice;               // (optional)
     private int limitOfEnrollment;
-    private boolean offline;
-    private boolean free;
-
-    @Enumerated(EnumType.STRING)
-    private EventStatus eventStatus = EventStatus.DRAFT;
 
 }

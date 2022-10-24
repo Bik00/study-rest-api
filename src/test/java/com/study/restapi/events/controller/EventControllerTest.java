@@ -2,25 +2,28 @@ package com.study.restapi.events.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.restapi.events.Event;
+import com.study.restapi.events.EventStatus;
 import com.study.restapi.events.repository.EventRepository;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.time.LocalDateTime;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(value = {EventController.class})
+@SpringBootTest
+@AutoConfigureMockMvc
 class EventControllerTest {
 
     @Autowired
@@ -29,15 +32,13 @@ class EventControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @MockBean
-    EventRepository eventRepository;
-
     @Test
-    @DisplayName("성공적으로 이벤트 생성 시, 201 응답 코드를 반환합니다.")
+    @DisplayName("성공적으로 함수 수행 시, 201 응답 코드를 반환합니다. (CREATE 과정)")
     public void createEvent() throws Exception {
 
         // Given
         Event event = Event.builder()
+                .id(100)
                 .name("spring")
                 .description("REST API Development with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.now().withMinute(0).withSecond(0))
@@ -48,11 +49,10 @@ class EventControllerTest {
                 .basePrice(200)
                 .limitOfEnrollment(100)
                 .location("서울대 입구역 스터디 카페")
+                .free(true)
+                .offline(false)
+                .eventStatus(EventStatus.PUBLISHED)
                 .build();
-
-        // When
-        event.setId(10);
-        Mockito.when(eventRepository.save(event)).thenReturn(event);
 
         // Then
         mockMvc.perform(post("/api/events")
@@ -63,6 +63,9 @@ class EventControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
     }
 }
