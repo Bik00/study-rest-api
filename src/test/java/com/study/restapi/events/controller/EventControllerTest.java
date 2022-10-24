@@ -1,6 +1,7 @@
 package com.study.restapi.events.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.study.restapi.events.Dto.EventDto;
 import com.study.restapi.events.Event;
 import com.study.restapi.events.EventStatus;
 import com.study.restapi.events.repository.EventRepository;
@@ -67,5 +68,37 @@ class EventControllerTest {
                 .andExpect(jsonPath("id").value(Matchers.not(100)))
                 .andExpect(jsonPath("free").value(Matchers.not(true)))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
+    }
+
+    @Test
+    @DisplayName("주어진 입력값 이외에는 Bad Request를 반환합니다.")
+    public void createEvent_bad_request() throws Exception {
+
+        // Given
+        Event event = Event.builder()
+                .id(100)
+                .name("spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.now().withMinute(0).withSecond(0))
+                .closeEnrollmentDateTime(LocalDateTime.now().withMinute(59).withSecond(59))
+                .beginEventDateTime(LocalDateTime.now().plusDays(1).withHour(0).withMinute(0).withSecond(0))
+                .endEventDateTime(LocalDateTime.now().plusDays(1).withHour(23).withMinute(59).withSecond(59))
+                .basePrice(100)
+                .basePrice(200)
+                .limitOfEnrollment(100)
+                .location("서울대 입구역 스터디 카페")
+                .free(true)
+                .offline(false)
+                .eventStatus(EventStatus.PUBLISHED)
+                .build();
+
+        // Then
+        mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaTypes.HAL_JSON) // HAL 적용
+                .content(objectMapper.writeValueAsString(event)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
     }
 }
