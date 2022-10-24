@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Builder
 @AllArgsConstructor
@@ -33,4 +34,10 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
 
+    public void update() {
+
+        this.free = (this.basePrice == 0 && this.maxPrice == 0) ? true : false;
+        this.offline = Objects.isNull(this.location) || this.location.isBlank() ? false : true;
+
+    }
 }
