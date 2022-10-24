@@ -3,6 +3,7 @@ package com.study.restapi.events.controller;
 import com.study.restapi.events.Dto.EventDto;
 import com.study.restapi.events.Event;
 import com.study.restapi.events.repository.EventRepository;
+import com.study.restapi.events.validator.EventValidator;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
@@ -23,13 +24,22 @@ public class EventController {
 
     private final ModelMapper modelMapper;
 
-    public EventController(EventRepository eventRepository, ModelMapper modelMapper) {
+    private final EventValidator eventValidator;
+
+    public EventController(EventRepository eventRepository, ModelMapper modelMapper, EventValidator eventValidator) {
         this.eventRepository = eventRepository;
         this.modelMapper = modelMapper;
+        this.eventValidator = eventValidator;
     }
 
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
+
+        if(errors.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        eventValidator.validate(eventDto, errors);
 
         if(errors.hasErrors()) {
             return ResponseEntity.badRequest().build();
