@@ -4,16 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.restapi.events.Dto.EventDto;
 import com.study.restapi.events.Event;
 import com.study.restapi.events.EventStatus;
-import com.study.restapi.events.repository.EventRepository;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -38,8 +34,7 @@ class EventControllerTest {
     public void createEvent() throws Exception {
 
         // Given
-        Event event = Event.builder()
-                .id(100)
+        EventDto event = EventDto.builder()
                 .name("spring")
                 .description("REST API Development with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.now().withMinute(0).withSecond(0))
@@ -50,9 +45,6 @@ class EventControllerTest {
                 .basePrice(200)
                 .limitOfEnrollment(100)
                 .location("서울대 입구역 스터디 카페")
-                .free(true)
-                .offline(false)
-                .eventStatus(EventStatus.PUBLISHED)
                 .build();
 
         // Then
@@ -100,5 +92,16 @@ class EventControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
+    }
+
+    @Test
+    @DisplayName("입력 값이 아무 것도 없다면, Bad Request를 반환합니다.")
+    public void createEvent_Bad_Request_Empty_Input() throws Exception {
+        EventDto eventDto = EventDto.builder().build();
+
+        mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
     }
 }
